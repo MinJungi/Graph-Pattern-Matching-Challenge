@@ -1,0 +1,5 @@
+C:/Users/als15/Documents/GitHub/Graph-Pattern-Matching-Challenge/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/als15/Documents/GitHub/Graph-Pattern-Matching-Challenge/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+C:/Users/als15/Documents/GitHub/Graph-Pattern-Matching-Challenge/cmake-build-debug/main/CMakeFiles/program.dir
+C:/Users/als15/Documents/GitHub/Graph-Pattern-Matching-Challenge/cmake-build-debug/main/CMakeFiles/edit_cache.dir
+C:/Users/als15/Documents/GitHub/Graph-Pattern-Matching-Challenge/cmake-build-debug/main/CMakeFiles/rebuild_cache.dir
