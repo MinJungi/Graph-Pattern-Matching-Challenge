@@ -7,12 +7,6 @@
 #IncludeRegexTransform: 
 
 ../include/backtrack.h
-candidate_set.h
-../include/candidate_set.h
-common.h
-../include/common.h
-graph.h
-../include/graph.h
 stack
 -
 candidate_set.h
@@ -61,20 +55,14 @@ C:/Users/als15/Documents/GitHub/Graph-Pattern-Matching-Challenge/main/graph.h
 C:/Users/als15/Documents/GitHub/Graph-Pattern-Matching-Challenge/src/backtrack.cc
 backtrack.h
 C:/Users/als15/Documents/GitHub/Graph-Pattern-Matching-Challenge/src/backtrack.h
-backtrack.h
-C:/Users/als15/Documents/GitHub/Graph-Pattern-Matching-Challenge/src/backtrack.h
 queue
 -
 stack
 -
 array
 -
-
-C:/Users/als15/Documents/GitHub/Graph-Pattern-Matching-Challenge/src/candidate_set.cc
-candidate_set.h
-C:/Users/als15/Documents/GitHub/Graph-Pattern-Matching-Challenge/src/candidate_set.h
-
-C:/Users/als15/Documents/GitHub/Graph-Pattern-Matching-Challenge/src/graph.cc
-graph.h
-C:/Users/als15/Documents/GitHub/Graph-Pattern-Matching-Challenge/src/graph.h
+utility
+-
+fstream
+-
 
