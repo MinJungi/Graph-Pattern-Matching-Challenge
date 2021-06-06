@@ -16,17 +16,19 @@ Backtrack::~Backtrack() {}
 
 int global_cnt = 0; //이걸로 embedding 개수 계산, 100000 넘으면 terminate
 std::vector<bool> global_data;
+bool fileio = false;
 std::ofstream writeFile("answer.txt");
 
 void Backtrack::PrintAllMatches(const Graph &data, const Graph &query, const CandidateSet &cs) {
 
 
-    //std::cout << "t " << query.GetNumVertices() << "\n";
-    writeFile << "t " << query.GetNumVertices() << "\n";
+    !fileio ? (std::cout << "t " << query.GetNumVertices() << "\n") : (writeFile << "t " << query.GetNumVertices() << "\n");
+    //writeFile << "t " << query.GetNumVertices() << "\n";
     // implement your code here.
 
     global_data.resize(data.GetNumVertices()); // 중복 체크 용도
     std::fill(global_data.begin(), global_data.end(), false);
+
 
     //root finding
     Vertex root = 0;
@@ -158,7 +160,8 @@ void Backtrack::PrintAllMatches(const Graph &data, const Graph &query, const Can
         embedding[just_matched] = -1;
         global_data[v] = false; // 중복체크 용도
     }
-    writeFile.close();
+    if(fileio) writeFile.close();
+    //writeFile.close();
 }
 
 
@@ -209,7 +212,7 @@ void Backtrack::recur(Vertex curr_embedding[], Vertex prev_matched, std::vector<
         global_cnt++;
         //writeFile << global_cnt << "\n";
         if(global_cnt == 100000) {
-            writeFile.close();
+            if(fileio) writeFile.close();
             exit(0);
         }
         return;
@@ -401,18 +404,20 @@ std::pair<std::vector<Vertex>, std::vector<std::vector<std::pair<Vertex, Vertex>
 }
 
 void Backtrack::print_embedding(const Vertex curr_embedding[], int size) {
-    /*
-    std::cout << "a";
+
+    fileio? (writeFile<<"a") : (std::cout << "a") ;
     for(int i=0;i<size;i++) {
-        std::cout  << " " << curr_embedding[i];
+        fileio? (writeFile  << " " << curr_embedding[i]) :(std::cout  << " " << curr_embedding[i]);
     }
-    std::cout << "\n";
-     */
+    fileio? (writeFile << "\n") : (std::cout << "\n");
+
+    /*
     writeFile << "a";
     for(int i=0;i<size;i++) {
         writeFile  << " " << curr_embedding[i];
     }
     writeFile << "\n";
+     */
 }
 
 bool Backtrack::embedding_checker(const Vertex curr_embedding[], const Graph &data, const Graph &query) {
