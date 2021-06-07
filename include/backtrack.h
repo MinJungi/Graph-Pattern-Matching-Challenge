@@ -34,6 +34,15 @@ public:
 
     bool embedding_checker(const Vertex curr_embedding[], const Graph &data, const Graph &query);
 
+    void recur(Vertex *curr_embedding, Vertex prev_matched, std::vector<std::pair<Vertex, std::vector<Vertex>>> old_ext_pair,
+               const Graph &data, const Graph &query, const CandidateSet &cs,
+               const std::vector<std::vector<Vertex>> &query_dag,
+               const std::vector<std::vector<Vertex>> &query_dag_inv);
+
+    std::vector<std::pair<Vertex, std::vector<Vertex>>> get_new_extendable_pair(std::vector<std::pair<Vertex, std::vector<Vertex>>> old_ext_pair, Vertex matched,
+                                                                                const Vertex *curr_embedding, const Graph &data, const CandidateSet &cs,
+                                                                                const std::vector<std::vector<Vertex>> &query_dag,
+                                                                                const std::vector<std::vector<Vertex>> &query_dag_inv);
 };
 
 #endif  // BACKTRACK_H_
