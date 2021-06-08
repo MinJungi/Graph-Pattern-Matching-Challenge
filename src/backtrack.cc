@@ -16,7 +16,7 @@ Backtrack::~Backtrack() {}
 
 int global_cnt = 0; //이걸로 embedding 개수 계산, 100000 넘으면 terminate
 std::vector<bool> global_data;
-bool fileio = false;
+bool fileio = false; //속도체크를 위해 console print가 아닌 file 출력으로도 실험해보기 위한 변수
 std::ofstream writeFile("answer.txt");
 
 void Backtrack::PrintAllMatches(const Graph &data, const Graph &query, const CandidateSet &cs) {
@@ -61,15 +61,11 @@ void Backtrack::PrintAllMatches(const Graph &data, const Graph &query, const Can
         dag_check[i] = -1;
     }
 
-
-    //std::cout << "root :" << root << "\n";
-
     //DAG 만드는 용도의 queue
     std::queue<Vertex> q;
     int cnt = 0;
     q.push(root);
     dag_check[root] = cnt++;
-
 
     while(!q.empty()) {
         Vertex curr = q.front();
@@ -108,17 +104,22 @@ void Backtrack::PrintAllMatches(const Graph &data, const Graph &query, const Can
         embedding[i] = -1;
     }
 
+    ///이 구간의 variable들은 ver1.2의 variable들로 실제로는 사용하지 않음.
     std::vector<Vertex> ext_vertex; //extendable vertex들의 벡터
     ext_vertex.push_back(root);
 
     std::vector<std::vector<std::pair<Vertex, Vertex>>> ext_candidate; //extendable candidate의 벡터 : pair의 앞이 u, 뒤가 v
     ext_candidate.resize(1);
+    ///
 
-    ////ver 1.3 ext_candidate와 ext_vertex를 합친 구조로 생성
+    ///ver 1.3 ext_candidate와 ext_vertex를 합친 구조로 생성
+    ///ext_pair는 extendable vertex와 extendable candidate를 pair로 묶어놓은 것들의 vector
+    ///ext_pair[0], ext_pair[1]...로 접근하며 각각은 extendable vertex와 extendable candidate의 pair로 이루어짐
+    ///즉, ext_pair[i].first는 extendable vertex이며 ext_pair[i].second는 이에 대응되는 extendable candidate
     std::vector<std::pair<Vertex, std::vector<Vertex>>> ext_pair;
-    std::pair<Vertex , std::vector<Vertex>> curr_pair;
-    std::vector<Vertex> curr_ext_candidate;
-    ////
+    //std::pair<Vertex , std::vector<Vertex>> curr_pair;
+    //std::vector<Vertex> curr_ext_candidate;
+    ///
 
     int root_cs_size = (int)cs.GetCandidateSize(root);
     //ver 1.2
@@ -137,8 +138,7 @@ void Backtrack::PrintAllMatches(const Graph &data, const Graph &query, const Can
     }
     ext_pair.push_back(std::make_pair(root, curr_ext_candidate_vector));
 
-
-    //여기까지 맨 처음 embedding (초기화된 상태), extendable vertex (현재 root) , extendable candidate 들을 구해놓았다
+    ///여기까지 맨 처음 embedding (초기화된 상태), extendable vertex (현재 root) , extendable candidate 들을 구해놓았다
 
     //extendable candidate 중 하나를 골라서 extend
     //ver1.2
@@ -165,8 +165,7 @@ void Backtrack::PrintAllMatches(const Graph &data, const Graph &query, const Can
         global_data[ext_pair[0].second[i]] = false;
     }
 
-    if(fileio) writeFile.close();
-    //writeFile.close();
+    writeFile.close();
 }
 
 //recur of ver 1.3
@@ -175,8 +174,16 @@ void Backtrack::PrintAllMatches(const Graph &data, const Graph &query, const Can
 void Backtrack::recur(Vertex curr_embedding[], Vertex prev_matched, std::vector<std::pair<Vertex, std::vector<Vertex>>> old_ext_pair,
                       const Graph &data, const Graph &query, const CandidateSet &cs,
                       const std::vector<std::vector<Vertex>> &query_dag, const std::vector<std::vector<Vertex>> &query_dag_inv) {
+    //get_new_extendable_pair의 1.3 version
+    //input variable이 old_ext_vertex, old_ext_candidate에서 old_ext_pair로 바뀜
+    //old_ext_pair에 가능한 ext_pair를 추가하여 return하고 이것을 new_ext_pair가 받음
     std::vector<std::pair<Vertex, std::vector<Vertex>>> new_ext_pair =
             get_new_extendable_pair(std::move(old_ext_pair), prev_matched, curr_embedding, data, cs, query_dag, query_dag_inv);
+
+    //new_ext_pair가 비어있다면 둘중하나.
+    // 1. matching이 끝남
+    // 2. 중간에 더 이상 matching이 불가능한 상황
+    // 1, 2에 맞는 작업을 하도록 함
     if(new_ext_pair.empty()){
         int size = query.GetNumVertices();
         for(int i=0;i<size;i++){
@@ -202,7 +209,9 @@ void Backtrack::recur(Vertex curr_embedding[], Vertex prev_matched, std::vector<
         }
     }
 
-    auto min_pair = new_ext_pair[min_index];
+    //위에서 찾은 extendable candiate의 크기가 가장 작은 vertex에 대한 matching 작업 시작
+    //backtracking 이용
+   auto min_pair = new_ext_pair[min_index];
     auto min_vertex = min_pair.first;
     auto min_candidate = min_pair.second;
 
@@ -220,6 +229,8 @@ void Backtrack::recur(Vertex curr_embedding[], Vertex prev_matched, std::vector<
     }
 }
 
+//이것 또한 ver1.3의 함수
+//현재 matching된 vertex (matched variable)의 child에 대해 적합한 것들만 ext_candidate를 구해서 (child, ext_candidate)의 pair를 old_ext_pair에 추가한 뒤 return해줌
 std::vector<std::pair<Vertex, std::vector<Vertex>>> Backtrack::get_new_extendable_pair(std::vector<std::pair<Vertex, std::vector<Vertex>>> old_ext_pair,
                                                                                        Vertex matched, const Vertex curr_embedding[], const Graph &data,
                                                                                        const CandidateSet &cs, const std::vector<std::vector<Vertex>> &query_dag,
@@ -232,7 +243,6 @@ std::vector<std::pair<Vertex, std::vector<Vertex>>> Backtrack::get_new_extendabl
         }
     }
 
-    Vertex new_ext_vertex;
     std::vector<Vertex> new_ext_candidate;
     for(Vertex child : query_dag[matched]){
         bool checker = true;
@@ -261,7 +271,7 @@ std::vector<std::pair<Vertex, std::vector<Vertex>>> Backtrack::get_new_extendabl
     return old_ext_pair;
 }
 
-
+//ver 1.2의 함수로 사용하지 않음
 void Backtrack::recur(Vertex curr_embedding[], Vertex prev_matched, std::vector<Vertex> old_ext_vertex, std::vector<std::vector<std::pair<Vertex, Vertex>>> old_ext_candidate,
                       const Graph &data, const Graph &query, const CandidateSet &cs,
                       const std::vector<std::vector<Vertex>> &query_dag, const std::vector<std::vector<Vertex>> &query_dag_inv) {
@@ -336,6 +346,7 @@ bool Backtrack::is_extendable_candidate(const std::pair<Vertex, Vertex> candidat
     return true;
 }
 
+//ver1.2의 함수로 ver1.3에서는 사용되지 않음
 //new_extendable_vertex와 new_extendable_candidate의 pair를 구해서 리턴해줌
 std::pair<std::vector<Vertex>, std::vector<std::vector<std::pair<Vertex, Vertex>>>> Backtrack::get_new_extendable_pair(std::vector<Vertex> old_extendable_vertex,
                                                                                                                        std::vector<std::vector<std::pair<Vertex, Vertex>>> old_extendable_candidate,
